@@ -18,7 +18,6 @@ def create_app() -> Flask:
   
     app = Flask(__name__)
     env = os.getenv('FLASK_ENV', 'development')
-    
    
     try:
         config_cls = factory(env)

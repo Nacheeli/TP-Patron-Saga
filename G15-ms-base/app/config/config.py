@@ -50,7 +50,6 @@ class ProductionConfig(Config):
         Config.validate_required_env_vars(['PROD_DATABASE_URI'])
 
 def factory(env="development"):
-    """Devuelve la configuración adecuada según el entorno."""
     configs = {
         "development": DevelopmentConfig,
         "testing": TestingConfig,
