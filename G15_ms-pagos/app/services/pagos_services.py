@@ -6,7 +6,6 @@ import time
 import random
 import logging
 
-# Config logger
 logger = logging.getLogger(__name__)
 
 class PagosService:
@@ -25,9 +24,6 @@ class PagosService:
         return cached_pagos
 
     def realizar_transaccion(self, pago: Pagos) -> dict:
-        """
-        Endpoint 1: Realiza una transacción que retorna 200 o 409 aleatoriamente
-        """
         logger.info("Procesando pago... Conectando con pasarela...")
         time.sleep(random.uniform(1, 3))
 
@@ -47,10 +43,6 @@ class PagosService:
             return {"status": "error", "code": 500, "data": None}
 
     def compensar_pago(self, pago_id: int) -> bool:
-        """
-        Endpoint 2: Realiza la compensación (reembolso) de un pago
-        Siempre retorna éxito (200)
-        """
         logger.info(f"Iniciando compensación para el pago {pago_id}...")
         
         try:

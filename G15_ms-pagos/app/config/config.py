@@ -10,12 +10,10 @@ class Config:
     
     @staticmethod
     def init_app(app):
-        """Método para inicializar configuraciones adicionales si es necesario."""
         pass
 
     @staticmethod
     def validate_required_env_vars(env_vars):
-        """Valida que las variables de entorno críticas estén definidas."""
         missing_vars = [var for var in env_vars if not os.getenv(var)]
         if missing_vars:
             raise ValueError(f"Las siguientes variables de entorno faltan o están vacías: {', '.join(missing_vars)}")
@@ -32,7 +30,6 @@ class DevelopmentConfig(Config):
 
     @staticmethod
     def init_app(app):
-        """Valida las variables de entorno críticas para desarrollo."""
         Config.validate_required_env_vars(['DEV_DATABASE_URI', 'REDIS_HOST', 'REDIS_PORT'])
 
 class TestingConfig(Config):
@@ -47,7 +44,6 @@ class TestingConfig(Config):
 
     @staticmethod
     def init_app(app):
-        """Valida las variables de entorno críticas para pruebas."""
         Config.validate_required_env_vars(['TEST_DB_URI', 'REDIS_HOST', 'REDIS_PORT'])
 
 class ProductionConfig(Config):
@@ -55,11 +51,9 @@ class ProductionConfig(Config):
 
     @staticmethod
     def init_app(app):
-        """Valida las variables de entorno críticas para producción."""
         Config.validate_required_env_vars(['PROD_DATABASE_URI'])
 
 def factory(env):
-    """Devuelve la configuración adecuada según el entorno."""
     envs = {
         "development": DevelopmentConfig,
         "production": ProductionConfig,
