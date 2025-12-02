@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--log.level=DEBUG"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - red1
+
+networks:
+  red1:
+    external: true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Luego seguir probando con los certificados de mkcert   
+# services:
+#   traefik:
+#     image: traefik:v2.10
+#     container_name: traefik
+#     restart: always
+#     command:
+#       - "--configFile=/etc/traefik/traefik.yml"  # Especificar el archivo de configuración
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#       - "8080:8080"
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock"
+#       - "./certs:/etc/traefik/certs"
+#       - "./traefik.yml:/etc/traefik/traefik.yml"
+# networks:
+#   red1:
+#     external: true
