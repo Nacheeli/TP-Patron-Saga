@@ -9,9 +9,6 @@ service = ProductoService()
 producto_schema = ProductoSchema()
 response_schema = ResponseSchema()
 
-# Aplicar limitadores específicos en las rutas
-
-
 @Producto.route('/producto', methods=['GET'])
 @limiter.limit("5 per minute")  # Límite específico para esta ruta
 def all():

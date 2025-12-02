@@ -12,7 +12,6 @@ from flask_limiter.util import get_remote_address
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 # Instancia global de extensiones
 db = SQLAlchemy()
 cache = Cache()
@@ -48,7 +47,6 @@ try:
     logger.info("Conexión a Redis exitosa.")
 except redis.ConnectionError as e:
     logger.error(f"Error al conectar con Redis: {e}")
-
 
 def create_app():
     app = Flask(__name__)
