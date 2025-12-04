@@ -25,18 +25,24 @@ def create_app() -> Flask:
     if uri_docker:
         app.config['SQLALCHEMY_DATABASE_URI'] = uri_docker
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        logger.info("--> PARCHE EXITOSO: Conectando a Base de Datos usando variable de Docker.")
+        logger.info("--> PARCHE BD: Usando URI de Docker.")
+
+    app.config['STOCK_URL'] = os.getenv('STOCK_URL')
+    app.config['PAGOS_URL'] = os.getenv('PAGOS_URL')
+    app.config['PRODUCTO_URL'] = os.getenv('PRODUCTO_URL')
+    app.config['COMPRAS_URL'] = os.getenv('COMPRAS_URL')
+    
+    logger.info(f"--> PARCHE URLs: Stock={app.config['STOCK_URL']}")
+
     try:
         db.init_app(app)
         cache.init_app(app, config=cache_config)
         logger.info("Extensiones inicializadas correctamente")
     except Exception as e:
         logger.error(f"Error inicializando extensiones: {e}")
-        raise RuntimeError(f"Error inicializando extensiones: {e}")
     
     @app.route('/ping', methods=['GET'])
     def ping():
-        """Endpoint de salud del servicio."""
         return {"mensaje": "El servicio de Base está en funcionamiento"}
     
     return app

@@ -13,7 +13,7 @@ class StockService:
         url = current_app.config['STOCK_URL']
         logger.info(f"Agregando stock: {data_stock}")
         response = HttpClient.post(url, data_stock)
-        validar_respuesta(response, expected_code=201)
+        validar_respuesta(response, codigo_esperado=201)
         return url, response.json()
 
     def borrar_stock(self, id_stock: str) -> bool:
@@ -23,18 +23,15 @@ class StockService:
         if response.status_code == 404:
             logger.warning(f"Stock con ID {id_stock} no encontrado.")
             return False
-        validar_respuesta(response, expected_code=204)
+        validar_respuesta(response, codigo_esperado=204)
         logger.info(f"Stock con ID {id_stock} borrado exitosamente.")
         return True
 
-    # --- NUEVA FUNCIÓN AGREGADA PARA EL FIX ---
     def validar_stock(self, producto_id: int, cantidad_necesaria: int) -> bool:
         """Consulta al ms-inventario si hay suficiente stock"""
         logger.info(f"Validando stock para producto {producto_id}, cantidad: {cantidad_necesaria}")
-        # Asumimos que el endpoint es /stock/<id>
         url = f"{current_app.config['STOCK_URL']}/{producto_id}"
         
-        # Usamos GET para consultar
         response = HttpClient.get(url)
         
         if response.status_code == 404:
@@ -43,8 +40,6 @@ class StockService:
             
         if response.status_code == 200:
             data = response.json()
-            # Asumimos que el inventario devuelve un campo 'cantidad' o similar
-            # Ajusta 'cantidad' si tu json usa otro nombre (ej: 'stock_actual')
             stock_actual = data.get('cantidad', 0) 
             
             if stock_actual >= cantidad_necesaria:
