@@ -1,4 +1,4 @@
-from app import cache, redis_client  # Se asume que redis_client está configurado
+from app import cache, redis_client
 from app.models import Compra
 from app.repositories import CompraRepository
 from contextlib import contextmanager
@@ -8,8 +8,8 @@ class CompraService:
     """
     Servicio para gestionar compras con soporte de caché y bloqueos en Redis para concurrencia.
     """
-    CACHE_TIMEOUT = 300  # Tiempo de expiración de caché en segundos
-    REDIS_LOCK_TIMEOUT = 10  # Tiempo de bloqueo en Redis en segundos
+    CACHE_TIMEOUT = 300
+    REDIS_LOCK_TIMEOUT = 10
 
     def __init__(self, repository=None):
         self.repository = repository or CompraRepository()
@@ -24,7 +24,7 @@ class CompraService:
 
         if redis_client.set(lock_key, lock_value, ex=self.REDIS_LOCK_TIMEOUT, nx=True):
             try:
-                yield  # Permite la ejecución del bloque protegido
+                yield
             finally:
                 redis_client.delete(lock_key)
         else:
@@ -63,16 +63,14 @@ class CompraService:
             if not existing_compra:
                 raise Exception(f"Compra con ID {compra_id} no encontrada.")
 
-            # Actualizar los atributos del objeto existente
             existing_compra.producto_id = updated_compra.producto_id
             existing_compra.fecha_compra = updated_compra.fecha_compra
             existing_compra.direccion_envio = updated_compra.direccion_envio
 
             saved_compra = self.repository.save(existing_compra)
 
-            # Actualizar la caché
             cache.set(f'compra_{compra_id}', saved_compra, timeout=self.CACHE_TIMEOUT)
-            cache.delete('compras')  # Invalida la lista de compras en caché
+            cache.delete('compras')
 
             return saved_compra
 

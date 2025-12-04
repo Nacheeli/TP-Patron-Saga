@@ -1,19 +1,17 @@
-#TODO://LISTO// manejar el versionado
-
 services:
   ms-compras:
     build:
       context: .
     image: ms-compras:v1.2
     environment:
-      - FLASK_ENV=${FLASK_ENV}  # Cambiar según el entorno a usar (development/production)
-      # Configuración de PostgreSQL
+      - FLASK_ENV=${FLASK_ENV} 
+
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=ecomercedb
       - POSTGRES_PORT=${POSTGRES_PORT}
-      # Configuración de Redis
+
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -21,7 +19,7 @@ services:
       - .env
     restart: always
     volumes:
-      - ./src:/app  # Sincroniza tu carpeta local con la del contenedor
+      - ./src:/app 
     networks:
       - red1
     labels:
@@ -29,7 +27,7 @@ services:
       - "traefik.http.routers.ms-compras.rule=Host(`compras.localhost`) && PathPrefix(`/api/v1`)"
       - "traefik.http.services.ms-compras.loadbalancer.server.port=5000"
     deploy: 
-      replicas: 1  # Número de instancias que deseas
+      replicas: 1
 
 networks:
   red1:
