@@ -1,0 +1,5 @@
+# Datos de PostgreSQL (no versionar)
+data/
+
+# VS Code settings (opcional, puede versionarse si el equipo lo prefiere)
+# .vscode/

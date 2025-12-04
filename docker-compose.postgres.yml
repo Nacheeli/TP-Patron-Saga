@@ -1,0 +1,13 @@
+services:
+  ecomercedb:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: ecomercedb
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
