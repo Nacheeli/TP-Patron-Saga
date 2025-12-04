@@ -10,10 +10,13 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=ecomercedb
       - POSTGRES_PORT=${POSTGRES_PORT}
+      - SQLALCHEMY_DATABASE_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@ecomercedb:${POSTGRES_PORT}/${POSTGRES_DB}
       - PAGOS_URL=http://ms-pagos:5002/api/v1/pagos
       - STOCK_URL=http://ms-inventario:5004/api/v1/stock
       - PRODUCTO_URL=http://ms-catalogo:5003/api/v1/producto
       - COMPRAS_URL=http://ms-compras:5001/api/v1/compra
+      - REDIS_HOST=redis_service
+      - REDIS_PORT=6379
     env_file:
       - .env
     ports:

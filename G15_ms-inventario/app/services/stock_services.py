@@ -1,7 +1,6 @@
 from app import cache, redis_client  
 from app.models import Stock    
 from app.repositories import StockRepository
-from app.services import StockService
 from contextlib import contextmanager
 import time
 import random
@@ -23,7 +22,6 @@ class StockService:
             try:
                 yield
             finally:
-               
                 current = redis_client.get(lock_key)
                 if current is not None and isinstance(current, bytes):
                     current = current.decode()
@@ -31,7 +29,6 @@ class StockService:
                     redis_client.delete(lock_key)
         else:
             raise Exception(f"El recurso está bloqueado para el stock {stock_id}.")
-
 
     def find(self, stock_id: int) -> Stock:
         cached_stock = cache.get(f'stock_{stock_id}')
@@ -64,7 +61,6 @@ class StockService:
             cache.delete('stocks') 
             return saved_stock
 
-
     def delete(self, stock_id: int) -> bool:
         with self.redis_lock(stock_id):
             deleted = self.repository.delete(stock_id)
@@ -72,15 +68,6 @@ class StockService:
                 cache.delete(f'stock_{stock_id}')
                 cache.delete('stocks')
             return deleted
-
-    def find(self, stock_id: int) -> Stock:
-        cached_stock = cache.get(f'stock_{stock_id}')
-        if cached_stock is None:
-            stock = self.repository.get_by_id(stock_id)
-            if stock:
-                cache.set(f'stock_{stock_id}', stock, timeout=self.CACHE_TIMEOUT)
-            return stock
-        return cached_stock
 
     def manage_stock(self, stock_id: int, cantidad: int) -> Stock:
         with self.redis_lock(stock_id):
@@ -101,21 +88,25 @@ class StockService:
             return updated_stock
         
     def reservar_stock(self, data):
-        producto_id = int(data.get('producto_id'))
-        cantidad = int(data.get('cantidad', 1))
-
-        if random.random() < 0.3:
-            print(f"Fallo aleatorio provocado para producto {producto_id}")
-            return {"Error": "Fallo de stock simulado"}, 409
-
+        """
+        Lógica para reservar stock (usada por la SAGA).
+        Devuelve una tupla (json, status_code).
+        """
         try:
+            producto_id = int(data.get('producto_id'))
+            cantidad = int(data.get('cantidad', 1))
+
+            if random.random() < 0.2:
+                print(f"Fallo aleatorio provocado para producto {producto_id}")
+                return {"Error": "Fallo de stock simulado (Aleatorio)"}, 409
+
             with self.redis_lock(producto_id):
                 stock = self.find(producto_id)
                 if not stock:
-                    return {"error": "Producto no encontrado"}, 404
+                    return {"error": "Producto no encontrado en inventario"}, 404
 
                 if stock.cantidad < cantidad:
-                    return {"error": "Stock insuficiente"}, 409
+                    return {"error": f"Stock insuficiente. Hay {stock.cantidad}"}, 409
 
                 stock.cantidad -= cantidad
                 updated_stock = self.repository.save(stock)
@@ -123,20 +114,25 @@ class StockService:
                 cache.set(f'stock_{producto_id}', updated_stock, timeout=self.CACHE_TIMEOUT)
                 cache.delete('stocks')
                 
-                return {"mensaje": "Stock reservado", "stock_restante": stock.cantidad}, 200
+                return {"mensaje": "Stock reservado", "stock_restante": stock.cantidad, "id": stock.id}, 200
         except Exception as e:
             return {"error": str(e)}, 500
     
     def compensar_stock(self, data):
-        producto_id = int(data.get('producto_id'))
-        cantidad = int(data.get('cantidad', 1))
-
+        """
+        Lógica para compensar (devolver) stock.
+        """
         try:
+            producto_id = int(data.get('producto_id', data.get('id', 0)))
+            cantidad = int(data.get('cantidad', 1))
+
+            if producto_id == 0:
+                 return {"error": "ID de producto inválido"}, 400
+
             with self.redis_lock(producto_id):
                 stock = self.find(producto_id)
                 if not stock:
-                   
-                    return {"error": "Producto no encontrado para compensar"}, 404
+                    return {"mensaje": "Producto no encontrado, nada que compensar"}, 200
                 
                 stock.cantidad += cantidad
                 updated_stock = self.repository.save(stock)
@@ -148,17 +144,3 @@ class StockService:
                 return {"mensaje": "Compensación exitosa"}, 200
         except Exception as e:
             return {"error": str(e)}, 500
-
-stock_service = StockService()
-
-@app.route('/stocks/reservar', methods=['POST'])
-def reservar():
-    data = request.get_json()
-    result, status_code = stock_service.reservar_stock(data)
-    return jsonify(result), status_code
-
-@app.route('/stocks/compensar', methods=['POST'])
-def compensar():
-    data = request.get_json()
-    result, status_code = stock_service.compensar_stock(data)
-    return jsonify(result), status_code

@@ -31,7 +31,7 @@ redis_client = redis.StrictRedis(
 
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["10 per minute"],
+    default_limits=["100 per minute"],
     storage_uri=redis_uri
 )
 
@@ -44,10 +44,17 @@ except redis.ConnectionError as e:
 def create_app():
     app = Flask(__name__)
     app_context = os.getenv('FLASK_ENV', 'development')
+    
     try:
         app.config.from_object(factory(app_context))
     except Exception as e:
-        raise RuntimeError(f"Error al cargar la configuración para el entorno {app_context}: {e}")
+        logger.error(f"Error al cargar la configuración para el entorno {app_context}: {e}")
+
+    uri_docker = os.getenv('SQLALCHEMY_DATABASE_URI')
+    if uri_docker:
+        app.config['SQLALCHEMY_DATABASE_URI'] = uri_docker
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        logger.info("--> PARCHE EXITOSO: Usando URI de base de datos desde Docker.")
 
     try:
         db.init_app(app)
@@ -62,7 +69,6 @@ def create_app():
     except Exception as e:
         raise RuntimeError(f"Error al registrar blueprints: {e}")
 
-    # Ruta de prueba
     @app.route('/ping', methods=['GET'])
     def ping():
         return {"message": "El servicio de pagos está en funcionamiento"}
