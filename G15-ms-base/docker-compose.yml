@@ -1,25 +1,26 @@
 services:
-  db:
-    image: postgres:15.6
-    container_name: ecomercedb
+  ms-orquestador:
+    build: .
+    container_name: ms-orquestador
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}        
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
-      POSTGRES_DB: ${POSTGRES_DB}       
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      
+      - FLASK_APP=main.py
+      - FLASK_ENV=${FLASK_ENV}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=ecomercedb
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - PAGOS_URL=http://ms-pagos:5002/api/v1/pagos
+      - STOCK_URL=http://ms-inventario:5004/api/v1/stock
+      - PRODUCTO_URL=http://ms-catalogo:5003/api/v1/producto
+      - COMPRAS_URL=http://ms-compras:5001/api/v1/compra
     env_file:
-      - .env                                    
+      - .env
     ports:
-      - "5432:5432"                             
-    volumes:
-      - postgres_data:/var/lib/postgresql/data   
+      - "5005:5005"
     networks:
-      - red1                                    
-
-volumes:
-  postgres_data:                                
+      - red1
 
 networks:
   red1:
-    external: true                          
+    external: true
