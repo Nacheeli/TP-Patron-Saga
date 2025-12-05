@@ -118,3 +118,19 @@ def manage(id):
     except Exception as e:
         response_builder.add_message("Error managing stock").add_status_code(500).add_data(str(e))
         return response_schema.dump(response_builder.build()), 500
+
+@Stock.route('/stock/producto/<int:producto_id>', methods=['GET'])
+@limiter.limit("100 per minute")
+def get_stock_by_producto(producto_id):
+    response_builder = ResponseBuilder()
+    try:
+        stock_disponible = service.get_stock_disponible(producto_id)
+        if stock_disponible is None:
+            response_builder.add_message("Producto not found").add_status_code(404).add_data({'producto_id': producto_id})
+            return response_schema.dump(response_builder.build()), 404
+        
+        response_builder.add_message("Stock found").add_status_code(200).add_data({'producto_id': producto_id, 'cantidad': stock_disponible})
+        return response_schema.dump(response_builder.build()), 200
+    except Exception as e:
+        response_builder.add_message("Error fetching stock").add_status_code(500).add_data(str(e))
+        return response_schema.dump(response_builder.build()), 500

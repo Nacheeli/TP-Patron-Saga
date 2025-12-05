@@ -30,7 +30,7 @@ class StockService:
     def validar_stock(self, producto_id: int, cantidad_necesaria: int) -> bool:
         """Consulta al ms-inventario si hay suficiente stock"""
         logger.info(f"Validando stock para producto {producto_id}, cantidad: {cantidad_necesaria}")
-        url = f"{current_app.config['STOCK_URL']}/{producto_id}"
+        url = f"{current_app.config['STOCK_URL']}/producto/{producto_id}"
         
         response = HttpClient.get(url)
         
@@ -39,14 +39,15 @@ class StockService:
             return False
             
         if response.status_code == 200:
-            data = response.json()
+            data = response.json().get('data', {})
             stock_actual = data.get('cantidad', 0) 
             
             if stock_actual >= cantidad_necesaria:
-                logger.info("Stock suficiente.")
+                logger.info(f"Stock suficiente. Hay {stock_actual}, se piden {cantidad_necesaria}")
                 return True
             else:
                 logger.warning(f"Stock insuficiente. Hay {stock_actual}, se piden {cantidad_necesaria}")
                 return False
         
+        logger.error(f"Error al consultar stock. Status: {response.status_code}")
         return False

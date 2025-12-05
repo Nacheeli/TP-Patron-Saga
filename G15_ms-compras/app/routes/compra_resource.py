@@ -77,8 +77,8 @@ def delete(id):
     response_builder = ResponseBuilder()
     try:
         if service.delete(id):
-            response_builder.add_message("Compra deleted").add_status_code(200).add_data({'id': id})
-            return response_schema.dump(response_builder.build()), 200
+            response_builder.add_message("Compra deleted").add_status_code(204).add_data({'id': id})
+            return response_schema.dump(response_builder.build()), 204
         else:
             response_builder.add_message("Compra not found").add_status_code(404).add_data({'id': id})
             return response_schema.dump(response_builder.build()), 404

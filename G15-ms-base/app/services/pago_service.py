@@ -13,24 +13,24 @@ class PagoService:
     def agregar_pago(self, data: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
        
         data_pago = data.get('pago')
-        url = current_app.config['PAGOS_URL']
+        url = f"{current_app.config['PAGOS_URL']}/transaccion"
 
         logger.info(f"Crear pago: {data_pago}")
         response = HttpClient.post(url, data_pago)
 
-        validar_respuesta(response, expected_code=201)
+        validar_respuesta(response, codigo_esperado=201)
         return url, response.json()
 
     def eliminar_pago(self, id_pago: str) -> bool:
        
         logger.info(f"Borrando pago con ID: {id_pago}")
-        url = f"{current_app.config['PAGOS_URL']}/{id_pago}"
-        response = HttpClient.delete(url)
+        url = f"{current_app.config['PAGOS_URL']}/{id_pago}/compensacion"
+        response = HttpClient.post(url, {})
 
         if response.status_code == 404:
             logger.warning(f"Pago con ID {id_pago} no encontrado.")
             return False
 
-        validar_respuesta(response, expected_code=204)
+        validar_respuesta(response, codigo_esperado=204)
         logger.info(f"Pago con ID {id_pago} borrado exitosamente.")
         return True

@@ -23,7 +23,7 @@ services:
     volumes:
       - ./src:/app
     networks:
-      - red1
+      - e_comerce_red1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ms-stock.rule=Host(`stock.localhost`) && PathPrefix(`/api/v1`)"
@@ -31,5 +31,5 @@ services:
     deploy:
       replicas: 1
 networks:
-  red1:
+  e_comerce_red1:
     external: true

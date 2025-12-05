@@ -86,6 +86,22 @@ class StockService:
             cache.delete('stocks')
 
             return updated_stock
+    
+    def get_stock_disponible(self, producto_id: int) -> int:
+        """Calcula el stock disponible total para un producto sumando entradas y restando salidas"""
+        from sqlalchemy import func, case
+        from app import db
+        
+        result = db.session.query(
+            func.sum(
+                case(
+                    (Stock.entrada_salida == 1, Stock.cantidad),
+                    else_=-Stock.cantidad
+                )
+            )
+        ).filter(Stock.producto_id == producto_id).scalar()
+        
+        return int(result) if result else None
         
     def reservar_stock(self, data):
         """

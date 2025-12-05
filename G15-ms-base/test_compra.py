@@ -52,9 +52,9 @@ acciones = [
 
 # Datos de prueba (Cliente compra 5 unidades del Producto 1)
 datos_saga = {
-    "pago": {"precio": 500, "medio_pago": "tarjeta", "producto_id": 1},
-    "compra": {"producto_id": 1, "fecha_compra": "2025-12-04", "direccion": "UTN San Rafael"},
-    "stock": {"producto_id": 1, "cantidad": 5, "entrada_salida": 2}
+    "pago": {"precio": 500, "medio_pago": "tarjeta de credito", "producto_id": 1},
+    "compra": {"producto_id": 1, "fecha_compra": "2025-12-04T10:30:00", "direccion_envio": "UTN San Rafael, Mendoza"},
+    "stock": {"producto_id": 1, "cantidad": 5, "entrada_salida": 2, "fecha_transaccion": "2025-12-05T19:30:00"}
 }
 
 # --- EJECUCIÓN ---

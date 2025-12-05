@@ -26,8 +26,8 @@ def realizar_transaccion():
             return response_schema.dump(response_builder.build()), 409
         
         data = pagos_schema.dump(resultado['data'])
-        response_builder.add_message("Transacción exitosa").add_status_code(200).add_data(data)
-        return response_schema.dump(response_builder.build()), 200
+        response_builder.add_message("Transacción exitosa").add_status_code(201).add_data(data)
+        return response_schema.dump(response_builder.build()), 201
         
     except ValidationError as err:
         response_builder.add_message("Validation error").add_status_code(422).add_data(err.messages)
@@ -47,8 +47,8 @@ def compensar_transaccion(id):
             response_builder.add_message("Pago no encontrado").add_status_code(404).add_data({'id': id})
             return response_schema.dump(response_builder.build()), 404
         
-        response_builder.add_message("Compensación realizada exitosamente").add_status_code(200).add_data({'id': id})
-        return response_schema.dump(response_builder.build()), 200
+        response_builder.add_message("Compensación realizada exitosamente").add_status_code(204).add_data({'id': id})
+        return response_schema.dump(response_builder.build()), 204
         
     except Exception as e:
         response_builder.add_message("Error realizando compensación").add_status_code(500).add_data(str(e))
