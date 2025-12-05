@@ -10,7 +10,7 @@ stock_schema = StockSchema()
 response_schema = ResponseSchema()
 
 @Stock.route('/stock', methods=['GET'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def all():
     response_builder = ResponseBuilder()
     try:
@@ -22,7 +22,7 @@ def all():
         return response_schema.dump(response_builder.build()), 500
 
 @Stock.route('/stock/<int:id>', methods=['GET'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def one(id):
     response_builder = ResponseBuilder()
     try:
@@ -39,7 +39,7 @@ def one(id):
         return response_schema.dump(response_builder.build()), 500
 
 @Stock.route('/stock', methods=['POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def add():
     response_builder = ResponseBuilder()
     try:
@@ -59,7 +59,7 @@ def add():
         return response_schema.dump(response_builder.build()), 500
 
 @Stock.route('/stock/<int:id>', methods=['PUT'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def update(id):
     response_builder = ResponseBuilder()
     try:
@@ -98,7 +98,7 @@ def delete(id):
         response_builder.add_message("Error deleting Stock").add_status_code(500).add_data(str(e))
         return response_schema.dump(response_builder.build()), 500
 @Stock.route('/stock/<int:id>/manage', methods=['POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def manage(id):
     response_builder = ResponseBuilder()
     try:

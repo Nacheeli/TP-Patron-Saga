@@ -11,6 +11,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=ecomercedb
       - POSTGRES_PORT=${POSTGRES_PORT}
+      - SQLALCHEMY_DATABASE_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@ecomercedb:${POSTGRES_PORT}/${POSTGRES_DB}
 
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -31,4 +32,4 @@ services:
 
 networks:
   red1:
-    external: true  
+    external: true

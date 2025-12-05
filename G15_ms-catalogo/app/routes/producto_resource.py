@@ -10,7 +10,7 @@ producto_schema = ProductoSchema()
 response_schema = ResponseSchema()
 
 @Producto.route('/producto', methods=['GET'])
-@limiter.limit("5 per minute")  # Límite específico para esta ruta
+@limiter.limit("100 per minute")
 def all():
     response_builder = ResponseBuilder()
     try:
@@ -25,7 +25,7 @@ def all():
 
 
 @Producto.route('/producto/<int:id>', methods=['GET'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def find(id):
     response_builder = ResponseBuilder()
     try:
@@ -46,7 +46,7 @@ def find(id):
 
 
 @Producto.route('/producto', methods=['POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def add():
     response_builder = ResponseBuilder()
     try:
@@ -70,7 +70,7 @@ def add():
 
 
 @Producto.route('/producto/<int:id>', methods=['PUT'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def update(id):
     response_builder = ResponseBuilder()
     try:
